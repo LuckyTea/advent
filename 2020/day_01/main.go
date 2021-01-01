@@ -7,10 +7,10 @@ import (
 
 func main() {
 	answer1 := part1()
-	fmt.Println("part 1 answer:", answer1)
+	fmt.Println("part 1 answer:", answer1) // 355875
 
 	answer2 := part2()
-	fmt.Println("part 2 answer:", answer2)
+	fmt.Println("part 2 answer:", answer2) // 140379120
 }
 
 const want = 2020
@@ -40,7 +40,7 @@ func part1() int {
 		break
 	}
 
-	return input[b] * input[e] // 355875
+	return input[b] * input[e]
 }
 
 func part2() int {
