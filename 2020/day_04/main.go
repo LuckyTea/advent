@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"regexp"
+	"strconv"
 	"strings"
 )
 
@@ -18,6 +20,8 @@ type passport struct {
 	pid string // Passport ID
 	cid string // Country ID
 }
+
+var eyeColors = []string{"amb", "blu", "brn", "gry", "grn", "hzl", "oth"}
 
 func main() {
 	file, err := os.Open("input")
@@ -34,8 +38,9 @@ func main() {
 	scanner := bufio.NewScanner(file)
 
 	var (
-		count int
-		p     passport
+		countPart1 int
+		countPart2 int
+		p          passport
 	)
 
 	for scanner.Scan() {
@@ -61,7 +66,11 @@ func main() {
 				p.cid = strings.TrimPrefix(fields[i], "cid:")
 			case fields[i] == "":
 				if p.validate() {
-					count++
+					countPart1++
+				}
+
+				if p.validateV2() {
+					countPart2++
 				}
 
 				p = passport{}
@@ -70,10 +79,15 @@ func main() {
 	}
 
 	if p.validate() {
-		count++
+		countPart1++
 	}
 
-	fmt.Println("count:", count) // 230
+	if p.validateV2() {
+		countPart2++
+	}
+
+	fmt.Println("answer part 1:", countPart1) // 230
+	fmt.Println("answer part 2:", countPart2) // 156
 }
 
 func (p *passport) validate() bool {
@@ -106,4 +120,59 @@ func (p *passport) validate() bool {
 	}
 
 	return true
+}
+
+func (p *passport) validateV2() bool {
+	if !validateRange(p.byr, 1920, 2002) {
+		return false
+	}
+
+	if !validateRange(p.iyr, 2010, 2020) {
+		return false
+	}
+
+	if !validateRange(p.eyr, 2020, 2030) {
+		return false
+	}
+
+	if strings.HasSuffix(p.hgt, "cm") {
+		if !validateRange(strings.TrimSuffix(p.hgt, "cm"), 150, 193) {
+			return false
+		}
+	} else if strings.HasSuffix(p.hgt, "in") {
+		if !validateRange(strings.TrimSuffix(p.hgt, "in"), 59, 76) {
+			return false
+		}
+	} else {
+		return false
+	}
+
+	if match, _ := regexp.MatchString("^#[0-9a-f]{6}$", p.hcl); !match {
+		return false
+	}
+
+	if !isContains(eyeColors, p.ecl) {
+		return false
+	}
+
+	if match, _ := regexp.MatchString("^[0-9]{9}$", p.pid); !match {
+		return false
+	}
+
+	return true
+}
+
+func validateRange(val string, lower, upper int) bool {
+	num, err := strconv.Atoi(val)
+	return err == nil && num >= lower && num <= upper
+}
+
+func isContains(arr []string, val string) bool {
+	for _, item := range arr {
+		if item == val {
+			return true
+		}
+	}
+
+	return false
 }
