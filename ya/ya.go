@@ -15,8 +15,6 @@ func transform(in []int) string {
 	var (
 		first = in[0]
 		last  int
-		comma bool
-		x     string
 		out   string
 	)
 
@@ -27,21 +25,14 @@ func transform(in []int) string {
 		}
 
 		if last != in[i]-1 {
+			if len(out) != 0 {
+				out += ","
+			}
+
 			if first != last {
-				out = fmt.Sprintf("%s%s%d-%d", out, x, first, last)
+				out = fmt.Sprintf("%s%d-%d", out, first, last)
 			} else {
-				out = fmt.Sprintf("%s%s%d", out, x, first)
-			}
-
-			if !comma {
-				x = ","
-				comma = true
-			}
-
-			if i == len(in) {
-				out = fmt.Sprintf("%s,%d", out, in[i])
-
-				break
+				out = fmt.Sprintf("%s%d", out, first)
 			}
 
 			first = in[i]
